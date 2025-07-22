@@ -1,59 +1,50 @@
-/* heroform.css — FINAL with form fixed bottom-right */
+/* heroform.css — mirrors your original HTML layout */
 
-/* ---------- HERO WRAPPER ---------- */
-.heroform{
-  position:relative;              /* containing block for absolute children */
-  width:100vw;                    /* true full width */
-  left:50%;
-  margin-left:-50vw;              /* break out of centered wrappers */
+/* reset inside block */
+.heroform *{ box-sizing:border-box; }
+
+/* ---------- HERO ---------- */
+.heroform .hero{
+  position:relative;
+  width:100%;
+  max-height:720px;
   overflow:hidden;
-  height:clamp(420px, 60vh, 720px);
 }
-
-.heroform .bg-img{
-  position:absolute;
-  inset:0;
+.heroform .hero .bg-img{
   width:100%;
   height:100%;
   object-fit:cover;
   display:block;
+  max-height:720px;
 }
 
-/* ---------- OVERLAY ---------- */
+/* overlay */
 .heroform .content-layer{
   position:absolute;
   inset:0;
-  z-index:1;
-  background:rgba(0,0,0,.45);
-  color:#fff;
+  padding:30px 20px;
   display:flex;
   flex-direction:column;
-  padding:30px 20px;
+  justify-content:space-between;
+  color:#fff;
+  background:rgba(0,0,0,.3);
 }
-
 .heroform .hero-inner{
-  flex:1 1 auto;
   max-width:1200px;
   margin:0 auto;
   display:flex;
   flex-direction:column;
+  height:100%;
 }
 
-/* ---------- TOP BAR ---------- */
+/* top bar */
 .heroform .top-bar{
-  position:relative;
-  z-index:4;                      /* above everything */
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:20px;
 }
-
-.heroform .logo img{
-  height:80px;
-  width:auto;
-}
-
+.heroform .logo img{ height:80px; }
 .heroform .phone-box{
   background:#0075c9;
   color:#fff;
@@ -61,34 +52,31 @@
   border-radius:5px;
   font-weight:700;
   font-size:1rem;
-  white-space:nowrap;
 }
 
-/* ---------- TEXT AREA ---------- */
+/* bottom overlay content */
 .heroform .bottom-content{
-  position:relative;
-  z-index:2;
-  margin-top:auto;
-  max-width:700px;
   display:flex;
-  flex-direction:column;
-  gap:12px;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:20px;
+  margin-top:auto;
+  flex-wrap:wrap;
 }
-
-.heroform .text-block .title h1,
+.heroform .text-block{ max-width:520px; }
 .heroform .text-block h1{
   font-size:2.2rem;
   font-weight:700;
   line-height:1.15;
+  margin:0;
 }
-.heroform .text-block .description p,
-.heroform .text-block p{
+.heroform .text-block p,
+.heroform .text-block .desc > *{
   margin-top:10px;
   font-size:1.1rem;
 }
 
-/* ---------- FORM (DESKTOP) ---------- */
-/* IMPORTANT: this element must be appended directly under .heroform, NOT inside .bottom-content */
+/* form */
 .heroform .form-box{
   background:#fff;
   color:#000;
@@ -98,13 +86,11 @@
   width:100%;
   box-shadow:0 4px 20px rgba(0,0,0,.2);
 }
-
 .heroform .form-box h2{
   font-size:1.1rem;
   text-align:center;
   margin-bottom:16px;
 }
-
 .heroform .form-box input,
 .heroform .form-box select{
   width:100%;
@@ -112,14 +98,11 @@
   margin-bottom:12px;
   border:1px solid #ccc;
   border-radius:4px;
-  font-size:.9rem;
 }
-
 .heroform .form-box .privacy{
   font-size:.75rem;
   margin-bottom:10px;
 }
-
 .heroform .checkbox{
   display:flex;
   align-items:flex-start;
@@ -131,7 +114,6 @@
   margin-top:4px;
   margin-right:6px;
 }
-
 .heroform .submit-btn{
   background:#4fb0e5;
   border:none;
@@ -141,10 +123,7 @@
   color:#fff;
   border-radius:5px;
   cursor:pointer;
-  transition:opacity .2s;
 }
-.heroform .submit-btn:hover{ opacity:.9; }
-
 .heroform .secure-note{
   text-align:center;
   font-size:.75rem;
@@ -152,42 +131,33 @@
   margin-top:10px;
 }
 
-/* PIN to bottom-right */
-.heroform .form-box.form-in-hero{
-  position:absolute;
-  right:50px;
-  bottom:50px;
-  margin:0;
-  transform:none;
-  z-index:3;
-}
+/* mobile holder hidden by default */
+.heroform .form-holder{ display:none; }
+.heroform .form-in-hero{ display:block; }
 
-/* ---------- MOBILE ---------- */
-.form-holder{display:none;}  /* external form container (shown on mobile) */
-
-@media (max-width:1024px){
-  .heroform .form-box.form-in-hero{
-    right:30px;
-    bottom:40px;
-  }
-}
-
+/* --------- MOBILE --------- */
 @media (max-width:768px){
-  .heroform{
-    height:auto;
+  .heroform .bottom-content{
+    flex-direction:column;
+    align-items:flex-start;
+    /* keep overlay for text; we’ll move the form below with display toggles */
   }
 
-  .heroform .content-layer{
-    padding:20px;
+  .heroform .form-box{
+    position:relative;
+    margin:20px auto 0;
+    max-width:480px;
+    z-index:0;
   }
 
-  /* Hide desktop form, show external one */
-  .heroform .form-box.form-in-hero{ display:none; }
-  .form-holder{ display:block; }
+  .heroform .content-layer{ padding:20px; }
 
-  .heroform .text-block .title h1,
-  .heroform .text-block h1{ font-size:1.8rem; }
+  .heroform .form-holder{ display:block; }
+  .heroform .form-in-hero{ display:none; }
 
-  .heroform .text-block .description p,
-  .heroform .text-block p{ font-size:1rem; }
+  .heroform .text-block{
+    color:#fff;
+    text-align:left;
+    padding:0 20px 20px 0;
+  }
 }
