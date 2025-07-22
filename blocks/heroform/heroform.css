@@ -1,19 +1,15 @@
-/* heroform.css – full, updated */
+/* heroform.css */
 
-/* ---------- BASE CONTAINER ---------- */
+/* -------- HERO WRAPPER -------- */
 .heroform{
   position:relative;
-  /* Break out of any centered wrapper to go truly edge‑to‑edge */
   width:100vw;
   left:50%;
   margin-left:-50vw;
   overflow:hidden;
-
-  /* Height control */
   height:clamp(420px, 60vh, 720px);
 }
 
-/* Background image always covers */
 .heroform .bg-img{
   position:absolute;
   inset:0;
@@ -23,39 +19,41 @@
   display:block;
 }
 
-/* ---------- OVERLAY LAYER ---------- */
+/* -------- OVERLAY -------- */
 .heroform .content-layer{
-  position:relative;           /* sits above bg */
-  z-index:1;
+  position:absolute;
   inset:0;
-  padding:30px 20px;
+  z-index:1;
+  background:rgba(0,0,0,.45);
+  color:#fff;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
-  color:#fff;
-  background:rgba(0,0,0,.35);
-  height:100%;
+  padding:30px 20px;
 }
 
 .heroform .hero-inner{
+  flex:1 1 auto;
   max-width:1200px;
   margin:0 auto;
   display:flex;
   flex-direction:column;
-  flex:1 1 auto;
 }
 
-/* ---------- TOP BAR ---------- */
+/* -------- TOP BAR -------- */
 .heroform .top-bar{
+  position:relative;
+  z-index:3;                 /* ensure on top of image/form */
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:20px;
 }
+
 .heroform .logo img{
   height:80px;
   width:auto;
 }
+
 .heroform .phone-box{
   background:#0075c9;
   color:#fff;
@@ -66,21 +64,14 @@
   white-space:nowrap;
 }
 
-/* ---------- BOTTOM CONTENT ---------- */
+/* -------- BOTTOM TEXT -------- */
 .heroform .bottom-content{
   position:relative;
-  display:flex;
-  justify-content:flex-start;
-  align-items:flex-end;
-  gap:20px;
+  z-index:2;
   margin-top:auto;
-  flex-wrap:nowrap;
-  padding-right:420px; /* reserve space for absolutely positioned form */
+  max-width:700px;
 }
 
-.heroform .text-block{
-  max-width:520px;
-}
 .heroform .text-block .title h1,
 .heroform .text-block h1{
   font-size:2.2rem;
@@ -93,7 +84,7 @@
   font-size:1.1rem;
 }
 
-/* ---------- FORM (DESKTOP IN-HERO) ---------- */
+/* -------- FORM (DESKTOP) -------- */
 .heroform .form-box{
   background:#fff;
   color:#000;
@@ -148,9 +139,7 @@
   cursor:pointer;
   transition:opacity .2s;
 }
-.heroform .submit-btn:hover{
-  opacity:.9;
-}
+.heroform .submit-btn:hover{ opacity:.9; }
 
 .heroform .secure-note{
   text-align:center;
@@ -159,21 +148,18 @@
   margin-top:10px;
 }
 
-/* Position the desktop form on the right bottom corner */
+/* Pin the desktop form bottom-right inside the hero */
 .heroform .form-box.form-in-hero{
   position:absolute;
   right:50px;
   bottom:50px;
-  z-index:2;
+  z-index:3;                 /* above overlay text */
 }
 
-/* ---------- MOBILE ---------- */
-.form-holder{display:none;} /* external form container, shown only on mobile */
+/* -------- MOBILE -------- */
+.form-holder{display:none;}  /* external form */
 
 @media (max-width:1024px){
-  .heroform .bottom-content{
-    padding-right:380px;
-  }
   .heroform .form-box.form-in-hero{
     right:30px;
     bottom:40px;
@@ -181,41 +167,25 @@
 }
 
 @media (max-width:768px){
-  /* Container can auto-height for mobile */
   .heroform{
     height:auto;
   }
 
   .heroform .content-layer{
     padding:20px;
-    background:rgba(0,0,0,.45);
   }
 
   .heroform .bottom-content{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:16px;
-    padding-right:0;
-  }
-
-  /* Hide in-hero form, show external form */
-  .heroform .form-box.form-in-hero{
-    display:none;
-  }
-  .form-holder{display:block;}
-
-  .heroform .text-block{
-    color:#fff;
-    text-align:left;
-    padding:0 0 20px;
     max-width:100%;
   }
+
+  /* hide desktop form, show external form */
+  .heroform .form-box.form-in-hero{ display:none; }
+  .form-holder{ display:block; }
+
   .heroform .text-block .title h1,
-  .heroform .text-block h1{
-    font-size:1.8rem;
-  }
+  .heroform .text-block h1{ font-size:1.8rem; }
+
   .heroform .text-block .description p,
-  .heroform .text-block p{
-    font-size:1rem;
-  }
+  .heroform .text-block p{ font-size:1rem; }
 }
