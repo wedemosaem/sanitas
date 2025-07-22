@@ -1,38 +1,28 @@
-/* -------- HEROFORM FULL-BLEED BASE -------- */
+/* heroform.css */
 .heroform{
-  width:100vw;
-  margin-left:calc(50% - 50vw);
-  margin-right:calc(50% - 50vw);
-  position:relative;
-  overflow:visible;
-}
-.heroform *{box-sizing:border-box;}
-
-/* -------- HERO -------- */
-.heroform .hero{
   position:relative;
   width:100%;
-  height:720px;
+  max-height:720px;
   overflow:hidden;
 }
-.heroform .hero .bg-img{
-  position:absolute;
-  inset:0;
+.heroform .bg-img{
   width:100%;
   height:100%;
   object-fit:cover;
   display:block;
+  max-height:720px;
 }
 
-/* -------- OVERLAY -------- */
+/* overlay */
 .heroform .content-layer{
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,.3);
-  color:#fff;
+  padding:30px 20px;
   display:flex;
   flex-direction:column;
-  padding:30px 20px;
+  justify-content:space-between;
+  color:#fff;
+  background:rgba(0,0,0,.3);
 }
 .heroform .hero-inner{
   max-width:1200px;
@@ -52,37 +42,36 @@
 .heroform .logo img{height:80px;}
 .heroform .phone-box{
   background:#0075c9;
+  color:#fff;
   padding:10px 20px;
   border-radius:5px;
   font-weight:700;
   font-size:1rem;
-  white-space:nowrap;
 }
 
-/* bottom area */
+/* bottom overlay content */
 .heroform .bottom-content{
-  margin-top:auto;
   display:flex;
-  gap:40px;
   justify-content:space-between;
   align-items:flex-end;
-  flex-wrap:nowrap;
+  gap:20px;
+  margin-top:auto;
+  flex-wrap:wrap;
 }
-.heroform .text-block{
-  max-width:520px;
-}
+.heroform .text-block{max-width:520px;}
+.heroform .text-block .title h1,
 .heroform .text-block h1{
-  font-size:2.4rem;
-  line-height:1.15;
+  font-size:2.2rem;
   font-weight:700;
-  margin:0;
+  line-height:1.15;
 }
-.heroform .text-block .desc > *{
+.heroform .text-block .description p,
+.heroform .text-block p{
   margin-top:10px;
   font-size:1.1rem;
 }
 
-/* form box */
+/* form */
 .heroform .form-box{
   background:#fff;
   color:#000;
@@ -104,24 +93,20 @@
   margin-bottom:12px;
   border:1px solid #ccc;
   border-radius:4px;
-  font-size:.9rem;
 }
-.heroform .privacy{
+.heroform .form-box .privacy{
   font-size:.75rem;
   margin-bottom:10px;
-  line-height:1.3;
 }
 .heroform .checkbox{
   display:flex;
   align-items:flex-start;
-  gap:6px;
   font-size:.75rem;
   margin-bottom:12px;
-  line-height:1.3;
 }
 .heroform .checkbox input{
   margin-top:4px;
-  flex-shrink:0;
+  margin-right:6px;
 }
 .heroform .submit-btn{
   background:#4fb0e5;
@@ -132,9 +117,7 @@
   color:#fff;
   border-radius:5px;
   cursor:pointer;
-  transition:opacity .2s;
 }
-.heroform .submit-btn:hover{opacity:.9;}
 .heroform .secure-note{
   text-align:center;
   font-size:.75rem;
@@ -142,52 +125,34 @@
   margin-top:10px;
 }
 
-/* desktop-only form (inside overlay) */
-.heroform .form-in-hero{display:block;}
-/* outside holder hidden on desktop */
-.heroform .form-holder{display:none;}
+/* Utility: desktop hide mobile holder */
+.form-holder{display:none;}
 
-/* -------- BREAKPOINTS -------- */
-@media (max-width:1024px){
-  .heroform .hero{height:600px;}
-  .heroform .text-block h1{font-size:2rem;}
-}
-
+/* --------- MOBILE --------- */
 @media (max-width:768px){
-  /* hero uses aspect ratio instead of fixed height */
-  .heroform .hero{
-    height:auto;
-    aspect-ratio:16 / 9;
+  .heroform .bottom-content{
+    flex-direction:column;
+    align-items:flex-start;
   }
+
+  .heroform .form-box.form-in-hero{
+    display:none;
+  }
+
+  .form-holder{display:block;}
 
   .heroform .content-layer{
     padding:20px;
   }
 
-  /* stack text, remove form from overlay */
-  .heroform .bottom-content{
-    flex-direction:column;
-    gap:20px;
-  }
   .heroform .text-block{
-    padding:0 0 10px 0;
-    max-width:100%;
+    color:#fff;
+    text-align:left;
+    padding:0 20px 20px;
   }
 
-  /* move form below hero */
-  .heroform .form-in-hero{display:none;}
-  .heroform .form-holder{
-    display:block;
-    width:100%;
-    max-width:480px;
-    margin:20px auto 0;
-    padding:0 20px;
+  .heroform .text-block .title h1,
+  .heroform .text-block h1{
+    font-size:1.8rem;
   }
-}
-
-@media (max-width:480px){
-  .heroform .logo img{height:60px;}
-  .heroform .phone-box{font-size:.9rem;padding:8px 14px;}
-  .heroform .text-block h1{font-size:1.7rem;}
-  .heroform .text-block .desc > *{font-size:1rem;}
 }
