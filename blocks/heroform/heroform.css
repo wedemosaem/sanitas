@@ -1,22 +1,26 @@
-/* Base Reset */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
 body, html {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* ---------- HERO SECTION ---------- */
+/* Full-width Hero Block */
 .hero {
   position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   width: 100vw;
   max-height: 720px;
   overflow: hidden;
 }
 
+/* Full-width Background Image */
 .hero img.bg-img {
   position: absolute;
   top: 0;
@@ -28,7 +32,7 @@ body, html {
   z-index: 0;
 }
 
-/* Overlay Layer */
+/* Overlay Content Layer */
 .content-layer {
   position: relative;
   z-index: 1;
@@ -56,11 +60,9 @@ body, html {
   align-items: center;
   gap: 20px;
 }
-
 .logo img {
   height: 80px;
 }
-
 .phone-box {
   background: #0075c9;
   color: #fff;
@@ -79,17 +81,14 @@ body, html {
   margin-top: auto;
   flex-wrap: wrap;
 }
-
 .text-block {
   max-width: 520px;
 }
-
 .text-block h1 {
   font-size: 2.2rem;
   font-weight: 700;
   line-height: 1.15;
 }
-
 .text-block p {
   margin-top: 10px;
   font-size: 1.1rem;
@@ -105,13 +104,11 @@ body, html {
   width: 100%;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
-
 .form-box h2 {
   font-size: 1.1rem;
   text-align: center;
   margin-bottom: 16px;
 }
-
 .form-box input,
 .form-box select {
   width: 100%;
@@ -120,24 +117,20 @@ body, html {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-
 .form-box .privacy {
   font-size: 0.75rem;
   margin-bottom: 10px;
 }
-
 .checkbox {
   display: flex;
   align-items: flex-start;
   font-size: 0.75rem;
   margin-bottom: 12px;
 }
-
 .checkbox input {
   margin-top: 4px;
   margin-right: 6px;
 }
-
 .submit-btn {
   background: #4fb0e5;
   border: none;
@@ -148,7 +141,6 @@ body, html {
   border-radius: 5px;
   cursor: pointer;
 }
-
 .secure-note {
   text-align: center;
   font-size: 0.75rem;
@@ -156,18 +148,16 @@ body, html {
   margin-top: 10px;
 }
 
-/* --------- RESPONSIVE --------- */
+/* Responsive */
 @media (max-width: 768px) {
   .bottom-content {
     flex-direction: column;
     align-items: flex-start;
   }
-
   .form-box {
     margin: 20px auto 0;
     max-width: 480px;
   }
-
   .text-block {
     color: #fff;
     text-align: left;
