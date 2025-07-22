@@ -1,11 +1,11 @@
-/* heroform.css */
+/* heroform.css — FINAL with form fixed bottom-right */
 
-/* -------- HERO WRAPPER -------- */
+/* ---------- HERO WRAPPER ---------- */
 .heroform{
-  position:relative;
-  width:100vw;
+  position:relative;              /* containing block for absolute children */
+  width:100vw;                    /* true full width */
   left:50%;
-  margin-left:-50vw;
+  margin-left:-50vw;              /* break out of centered wrappers */
   overflow:hidden;
   height:clamp(420px, 60vh, 720px);
 }
@@ -19,7 +19,7 @@
   display:block;
 }
 
-/* -------- OVERLAY -------- */
+/* ---------- OVERLAY ---------- */
 .heroform .content-layer{
   position:absolute;
   inset:0;
@@ -39,10 +39,10 @@
   flex-direction:column;
 }
 
-/* -------- TOP BAR -------- */
+/* ---------- TOP BAR ---------- */
 .heroform .top-bar{
   position:relative;
-  z-index:3;                 /* ensure on top of image/form */
+  z-index:4;                      /* above everything */
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -64,12 +64,15 @@
   white-space:nowrap;
 }
 
-/* -------- BOTTOM TEXT -------- */
+/* ---------- TEXT AREA ---------- */
 .heroform .bottom-content{
   position:relative;
   z-index:2;
   margin-top:auto;
   max-width:700px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
 .heroform .text-block .title h1,
@@ -84,7 +87,8 @@
   font-size:1.1rem;
 }
 
-/* -------- FORM (DESKTOP) -------- */
+/* ---------- FORM (DESKTOP) ---------- */
+/* IMPORTANT: this element must be appended directly under .heroform, NOT inside .bottom-content */
 .heroform .form-box{
   background:#fff;
   color:#000;
@@ -148,16 +152,18 @@
   margin-top:10px;
 }
 
-/* Pin the desktop form bottom-right inside the hero */
+/* PIN to bottom-right */
 .heroform .form-box.form-in-hero{
   position:absolute;
   right:50px;
   bottom:50px;
-  z-index:3;                 /* above overlay text */
+  margin:0;
+  transform:none;
+  z-index:3;
 }
 
-/* -------- MOBILE -------- */
-.form-holder{display:none;}  /* external form */
+/* ---------- MOBILE ---------- */
+.form-holder{display:none;}  /* external form container (shown on mobile) */
 
 @media (max-width:1024px){
   .heroform .form-box.form-in-hero{
@@ -175,11 +181,7 @@
     padding:20px;
   }
 
-  .heroform .bottom-content{
-    max-width:100%;
-  }
-
-  /* hide desktop form, show external form */
+  /* Hide desktop form, show external one */
   .heroform .form-box.form-in-hero{ display:none; }
   .form-holder{ display:block; }
 
