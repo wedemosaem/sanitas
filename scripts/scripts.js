@@ -10,7 +10,79 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  getMetadata
 } from './aem.js';
+
+import {
+  initMartech,
+  updateUserConsent,
+  martechEager,
+  martechLazy,
+  martechDelayed,
+} from '../plugins/martech/src/index.js';
+
+
+const AUDIENCES = {
+  mobile: () => window.innerWidth < 600,
+  desktop: () => window.innerWidth >= 600,
+  // define your custom audiences here as needed
+};
+
+let pageType = 'CMS';
+
+const isConsentGiven = true;
+const martechLoadedPromise = initMartech(
+  // The WebSDK config
+  // Documentation: https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/overview#configure-js
+  {
+    datastreamId: "0a2e588b-244b-434f-9d7c-6da642f88b89",
+    orgId: "0E061E2D61F93F260A495FD6@AdobeOrg",
+    defaultConsent: 'in',
+    onBeforeEventSend: (payload) => {
+      // set custom Target params
+      // see doc at https://experienceleague.adobe.com/en/docs/platform-learn/migrate-target-to-websdk/send-parameters#parameter-mapping-summary
+      payload.data.__adobe.target ||= {};
+
+      // set custom Analytics params
+      // see doc at https://experienceleague.adobe.com/en/docs/analytics/implementation/aep-edge/data-var-mapping
+      payload.data.__adobe.analytics ||= {};
+    },
+
+    // set custom datastream overrides
+    // see doc at:
+    // - https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/datastream-overrides
+    // - https://experienceleague.adobe.com/en/docs/experience-platform/datastreams/overrides
+    edgeConfigOverrides: {
+      // Override the datastream id
+      // datastreamId: '...'
+
+      // Override AEP event datasets
+      // com_adobe_experience_platform: {
+      //   datasets: {
+      //     event: {
+      //       datasetId: '...'
+      //     }
+      //   }
+      // },
+
+      // Override the Analytics report suites
+      // com_adobe_analytics: {
+      //   reportSuites: ['...']
+      // },
+
+      // Override the Target property token
+      // com_adobe_target: {
+      //   propertyToken: '...'
+      // }
+    },
+  },
+  // The library config
+  {
+    launchUrls: ["https://assets.adobedtm.com/59610d662d36/7a8753ffe928/launch-91b245998a62-development.min.js"],
+    personalization: !!getMetadata('target') && isConsentGiven,
+  },
+);
+
 
 /**
  * Moves all the attributes from a given elmenet to another given element.
@@ -96,8 +168,13 @@ async function loadEager(doc) {
   if (main) {
     decorateMain(main);
     document.body.classList.add('appear');
-    await loadSection(main.querySelector('.section'), waitForFirstImage);
+    await Promise.all([
+      martechLoadedPromise.then(martechEager),
+      loadSection(main.querySelector('.section'), waitForFirstImage)
+    ]);
   }
+
+
 
   try {
     /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
@@ -126,6 +203,8 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+
+  await martechLazy();
 }
 
 /**
@@ -136,7 +215,37 @@ function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
+  window.setTimeout(() => {
+    martechDelayed();
+    return import('./delayed.js');
+  }, 3000);
 }
+
+window.adobeDataLayer.push({
+  pageContext: {
+    pageType,
+    pageName: document.title,
+    eventType: 'visibilityHidden',
+    maxXOffset: 0,
+    maxYOffset: 0,
+    minXOffset: 0,
+    minYOffset: 0,
+  },
+  _demosystem4: {
+    identification:{
+      core:{
+        ecid: '36662526972022812694144525040584891102'
+      }
+    }
+  },
+  web: {
+    webPageDetails:{
+      name: document.title,
+      URL: window.location.href
+    }
+  }
+});
+
 
 async function loadPage() {
   await loadEager(document);

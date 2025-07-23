@@ -126,14 +126,24 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+
+  // WKND: Turn the picture (image) into a linked site logo
+  const logo = navBrand.querySelector('picture');
+
+  if (logo) {
+    // Replace the first section's contents with the authored image wrapped with a link to '/'
+    navBrand.innerHTML = `<a href="/" aria-label="Home" title="Home" class="home">${logo.outerHTML}</a>`;
+    // Make sure the logo is not lazy loaded as it's above the fold and can affect page load speed
+    navBrand.querySelector('img').setAttribute('loading', 'eager');
   }
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
+    // WKND: Remove Edge Delivery Services button containers and buttons from the nav sections links
+    navSections.querySelectorAll('.button-container, .button').forEach((button) => {
+      button.classList = '';
+    });
+
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
       navSection.addEventListener('click', () => {
