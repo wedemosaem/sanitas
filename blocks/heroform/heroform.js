@@ -1,4 +1,3 @@
-// /blocks/hb-hero/hb-hero.js
 const DEFAULT_IMG = 'https://placehold.co/1200x670';
 
 function el(tag, attrs = {}, kids = []) {
@@ -94,7 +93,7 @@ export default function decorate(block) {
   // text block
   const textBlock = el('div', { class: 'hb-text-block' }, el('h1', { text: title }));
   if (descHTML) {
-    // turn HTML into paragraphs (split by <br> too)
+    // keep paragraphs & breaks
     const tmp = document.createElement('div');
     tmp.innerHTML = descHTML;
     let buf = '';
