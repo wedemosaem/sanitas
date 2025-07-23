@@ -12,11 +12,16 @@ body, html {
 /* ---------- HERO SECTION ---------- */
 .hero {
   position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   width: 100vw;
   max-height: 720px;
   overflow: hidden;
 }
 
+/* Fullscreen background image */
 .hero img.bg-img {
   position: absolute;
   top: 0;
@@ -28,18 +33,22 @@ body, html {
   z-index: 0;
 }
 
-/* Overlay Layer */
+/* ✅ Overlay should exactly match the image */
 .content-layer {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100%;
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   color: #fff;
   background: rgba(0, 0, 0, 0.3);
-  height: 100%;
+  z-index: 1;
 }
+
 
 .hero-inner {
   max-width: 1200px;
