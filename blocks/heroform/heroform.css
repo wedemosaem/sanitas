@@ -20,7 +20,7 @@ body, html {
   overflow: hidden;
 }
 
-/* Fullscreen background image */
+/* Full-width Background Image */
 .hero img.bg-img {
   position: absolute;
   top: 0;
@@ -32,22 +32,18 @@ body, html {
   z-index: 0;
 }
 
-/* ✅ Overlay should exactly match the image */
+/* Overlay Content Layer */
 .content-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100%;
+  position: relative;
+  z-index: 1;
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   color: #fff;
   background: rgba(0, 0, 0, 0.3);
-  z-index: 1;
+  height: 100%;
 }
-
 
 .hero-inner {
   max-width: 1200px;
