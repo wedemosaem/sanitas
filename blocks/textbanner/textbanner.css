@@ -1,0 +1,37 @@
+/* textbanner.css */
+.tbx-textbanner {
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .tbx-textbanner__inner {
+    padding: 2rem 1.5rem;
+    box-sizing: border-box;
+    /* fallback bg in case author leaves it empty */
+    background: #1e5799;
+    color: #fff;
+  }
+  
+  .tbx-textbanner__content {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: inherit;
+    line-height: 1.5;
+    font-size: 1rem;
+  }
+  
+  /* Example emphases inside rich text */
+  .tbx-textbanner__content strong {
+    font-weight: 700;
+  }
+  
+  /* Responsive tweaks */
+  @media (min-width: 768px) {
+    .tbx-textbanner__inner {
+      padding: 3rem 2rem;
+    }
+    .tbx-textbanner__content {
+      font-size: 1.15rem;
+    }
+  }
+  

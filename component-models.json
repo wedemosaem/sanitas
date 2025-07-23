@@ -240,5 +240,50 @@
         "valueType": "string"
       }
     ]
+  },
+  {
+    "id": "textbanner",
+    "fields": [
+      {
+        "component": "richtext",
+        "name": "text",
+        "value": "",
+        "label": "Text",
+        "valueType": "string"
+      },
+      {
+        "component": "select",
+        "name": "textalign",
+        "label": "Text Align",
+        "options": [
+          {
+            "name": "left",
+            "value": "left"
+          },
+          {
+            "name": "right",
+            "value": "right"
+          },
+          {
+            "name": "center",
+            "value": "center"
+          }
+        ]
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "textcolor",
+        "label": "Text Color",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "backgroundcolor",
+        "label": "Background Color",
+        "value": ""
+      }
+    ]
   }  
 ]
