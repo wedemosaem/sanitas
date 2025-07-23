@@ -1,35 +1,44 @@
+/* full-bleed section helpers */
+.section.hero-full {
+  padding: 0 !important;
+}
+.section.hero-full > div { /* the inner wrapper EDS adds */
+  max-width: none !important;
+  padding: 0 !important;
+}
+
 /* ---------- HERO ---------- */
 .hero{
   position:relative;
   width:100%;
-  max-height:720px;
   overflow:hidden;
+  min-height: 670px; /* or clamp(...) */
 }
 .hero img.bg-img{
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
   display:block;
-  max-height:720px;
 }
 
-/* overlay */
+/* overlay exactly same size as image */
 .content-layer{
   position:absolute;
   inset:0;
-  padding:30px 20px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
   color:#fff;
   background:rgba(0,0,0,.3);
+  display:flex;
+  flex-direction:column;
 }
 .hero-inner{
   max-width:1200px;
   margin:0 auto;
+  height:100%;
   display:flex;
   flex-direction:column;
-  height:100%;
+  padding:30px 20px;          /* moved from .content-layer */
 }
 
 /* top bar */
@@ -49,7 +58,7 @@
   font-size:1rem;
 }
 
-/* bottom overlay content */
+/* bottom content */
 .bottom-content{
   display:flex;
   justify-content:space-between;
@@ -130,8 +139,8 @@
     flex-direction:column;
     align-items:flex-start;
   }
-  .content-layer{ padding:20px; }
-  .text-block{ color:#fff; text-align:left; padding:0 20px 20px; }
+  .hero-inner{ padding:20px; }
+  .text-block{ color:#fff; text-align:left; padding:0 0 20px; }
 
   .form-holder{display:block;}
   .form-in-hero{display:none;}
