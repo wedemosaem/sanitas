@@ -1,122 +1,130 @@
+// heroform.js
+// Expected spreadsheet columns: [image][title rich][description rich]
+// Title & description keep their internal markup by moving child nodes (not using innerHTML)
+
 export default function decorate(block) {
-  const container = document.createElement('div');
-  container.className = 'hero';
+  block.classList.add('heroform');
 
-  // Background image
-  const bgImg = document.createElement('img');
-  bgImg.src = 'https://serviciosdesalud.sanitas.es/uploads/66e1a26e9ba67.jpg';
-  bgImg.alt = 'Fondo Sanitas';
-  bgImg.className = 'bg-img';
-  container.appendChild(bgImg);
+  const [imgCell, titleCell, descCell] = Array.from(block.children);
 
-  // Overlay layer
-  const overlay = document.createElement('div');
-  overlay.className = 'content-layer';
+  // Resolve bg image
+  const authoredImg = imgCell?.querySelector('img');
+  const bgSrc = authoredImg ? authoredImg.src : (imgCell?.textContent.trim() || '');
 
-  const heroInner = document.createElement('div');
-  heroInner.className = 'hero-inner';
+  // Move children to fragments (preserves rich HTML without innerHTML)
+  const titleFrag = moveChildren(titleCell);
+  const descFrag  = moveChildren(descCell);
+
+  // Clear original authored cells
+  block.textContent = '';
+
+  /* -------- Build DOM -------- */
+  const hero = el('div', { class: 'hero' });
+  const bgImg = el('img', { class: 'bg-img', src: bgSrc, alt: '' });
+  hero.append(bgImg);
+
+  const contentLayer = el('div', { class: 'content-layer' });
+  const heroInner    = el('div', { class: 'hero-inner' });
 
   // Top bar
-  const topBar = document.createElement('div');
-  topBar.className = 'top-bar';
-
-  const logo = document.createElement('div');
-  logo.className = 'logo';
-  const logoImg = document.createElement('img');
-  logoImg.src = 'https://serviciosdesalud.sanitas.es/assets/img/logo-sanitas-b.png';
-  logoImg.alt = 'Sanitas Logo';
-  logo.appendChild(logoImg);
-
-  const phoneBox = document.createElement('div');
-  phoneBox.className = 'phone-box';
-  phoneBox.textContent = '📞 91 291 93 92';
-
-  topBar.appendChild(logo);
-  topBar.appendChild(phoneBox);
+  const topBar   = el('div', { class: 'top-bar' });
+  const logo     = el('div', { class: 'logo' });
+  logo.append(el('img', { src: 'https://serviciosdesalud.sanitas.es/assets/img/logo-sanitas-b.png', alt: 'Sanitas Logo' }));
+  const phoneBox = el('div', { class: 'phone-box' }, '📞 91 291 93 92');
+  topBar.append(logo, phoneBox);
 
   // Bottom content
-  const bottomContent = document.createElement('div');
-  bottomContent.className = 'bottom-content';
+  const bottomContent = el('div', { class: 'bottom-content' });
 
-  // Text block
-  const textBlock = document.createElement('div');
-  textBlock.className = 'text-block';
-  const h1 = document.createElement('h1');
-  h1.textContent = 'MICROESPUMA PARA VARICES';
-  const p1 = document.createElement('p');
-  p1.textContent = 'Tratamiento de varices sin cirugía ni cicatrices';
-  const p2 = document.createElement('p');
-  p2.textContent = 'Te cuidamos, con o sin seguro';
-  textBlock.appendChild(h1);
-  textBlock.appendChild(p1);
-  textBlock.appendChild(p2);
+  const textBlock = el('div', { class: 'text-block' });
+  const h1 = el('h1'); h1.append(titleFrag);
+  textBlock.append(h1);
 
-  // Form
-  const formBox = document.createElement('div');
-  formBox.className = 'form-box form-in-hero';
+  // wrap desc fragment to keep spacing rules
+  // original HTML used <p>. We'll just append whatever came.
+  const descWrap = document.createDocumentFragment();
+  descWrap.append(descFrag);
+  textBlock.append(descWrap);
 
-  const formTitle = document.createElement('h2');
-  formTitle.textContent = 'TE ASESORAMOS SIN COMPROMISO';
+  // Desktop form
+  const formDesktop = buildFormBox('consent');
+  formDesktop.classList.add('form-in-hero');
 
-  const nameInput = document.createElement('input');
-  nameInput.type = 'text';
-  nameInput.placeholder = 'Nombre';
+  bottomContent.append(textBlock, formDesktop);
 
-  const emailInput = document.createElement('input');
-  emailInput.type = 'email';
-  emailInput.placeholder = 'Email';
+  heroInner.append(topBar, bottomContent);
+  contentLayer.append(heroInner);
+  hero.append(contentLayer);
 
-  const phoneInput = document.createElement('input');
-  phoneInput.type = 'tel';
-  phoneInput.placeholder = 'Teléfono';
+  // Mobile form holder under hero
+  const formHolder = el('div', { class: 'form-holder' });
+  formHolder.append(buildFormBox('consent-m'));
 
-  const select = document.createElement('select');
-  const optionDefault = document.createElement('option');
-  optionDefault.disabled = true;
-  optionDefault.selected = true;
-  optionDefault.textContent = 'Provincia';
-  select.appendChild(optionDefault);
-  ['Madrid', 'Barcelona', 'Valencia'].forEach(city => {
-    const opt = document.createElement('option');
-    opt.textContent = city;
-    select.appendChild(opt);
+  // Mount everything
+  block.append(hero, formHolder);
+}
+
+/* ---------- helpers ---------- */
+
+function el(tag, attrs = {}, text) {
+  const node = document.createElement(tag);
+  Object.entries(attrs).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) node.setAttribute(k, v);
   });
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
 
-  const privacy = document.createElement('div');
-  privacy.className = 'privacy';
-  privacy.innerHTML = 'Consulta la <a href="#">información de privacidad</a>';
+function option({ text, value = text, disabled = false, selected = false }) {
+  const o = document.createElement('option');
+  o.textContent = text;
+  o.value = value;
+  if (disabled) o.disabled = true;
+  if (selected) o.selected = true;
+  return o;
+}
 
-  const checkbox = document.createElement('div');
-  checkbox.className = 'checkbox';
-  const cbInput = document.createElement('input');
-  cbInput.type = 'checkbox';
-  cbInput.id = 'consent';
-  const cbLabel = document.createElement('label');
-  cbLabel.setAttribute('for', 'consent');
-  cbLabel.textContent = 'Consiento el tratamiento y la cesión por parte de Sanitas a las entidades del grupo Sanitas.';
-  checkbox.appendChild(cbInput);
-  checkbox.appendChild(cbLabel);
+function buildFormBox(consentId) {
+  const box = el('div', { class: 'form-box' });
 
-  const button = document.createElement('button');
-  button.className = 'submit-btn';
-  button.textContent = 'RECIBIR ASESORAMIENTO';
+  const h2 = el('h2'); h2.textContent = 'TE ASESORAMOS SIN COMPROMISO';
 
-  const note = document.createElement('div');
-  note.className = 'secure-note';
-  note.textContent = '🔒 Tus datos se tratan de forma segura.';
+  const nameInp = el('input', { type: 'text', placeholder: 'Nombre', 'aria-label': 'Nombre' });
+  const mailInp = el('input', { type: 'email', placeholder: 'Email', 'aria-label': 'Email' });
+  const telInp  = el('input', { type: 'tel', placeholder: 'Teléfono', 'aria-label': 'Teléfono' });
 
-  // Assemble form
-  [formTitle, nameInput, emailInput, phoneInput, select, privacy, checkbox, button, note]
-    .forEach(el => formBox.appendChild(el));
+  const provSel = el('select', { 'aria-label': 'Provincia' });
+  provSel.append(
+    option({ text: 'Provincia', disabled: true, selected: true }),
+    option({ text: 'Madrid' }),
+    option({ text: 'Barcelona' }),
+    option({ text: 'Valencia' }),
+  );
 
-  bottomContent.appendChild(textBlock);
-  bottomContent.appendChild(formBox);
+  const privacy = el('div', { class: 'privacy' });
+  privacy.append(document.createTextNode('Consulta la '));
+  const a = el('a', { href: '#' }); a.textContent = 'información de privacidad';
+  privacy.append(a);
 
-  // Assemble final structure
-  heroInner.appendChild(topBar);
-  heroInner.appendChild(bottomContent);
-  overlay.appendChild(heroInner);
-  container.appendChild(overlay);
+  const chkWrap = el('div', { class: 'checkbox' });
+  const chk = el('input', { type: 'checkbox', id: consentId });
+  const lbl = el('label', { for: consentId });
+  lbl.textContent = 'Consiento el tratamiento y la cesión por parte de Sanitas a las entidades del grupo Sanitas.';
+  chkWrap.append(chk, lbl);
 
-  block.appendChild(container);
+  const btn = el('button', { class: 'submit-btn', type: 'button' }, 'RECIBIR ASESORAMIENTO');
+
+  const secure = el('div', { class: 'secure-note' }, '🔒 Tus datos se tratan de forma segura.');
+
+  box.append(h2, nameInp, mailInp, telInp, provSel, privacy, chkWrap, btn, secure);
+  return box;
+}
+
+function moveChildren(srcEl) {
+  const frag = document.createDocumentFragment();
+  if (!srcEl) return frag;
+  while (srcEl.firstChild) {
+    frag.appendChild(srcEl.firstChild);
+  }
+  return frag;
 }
