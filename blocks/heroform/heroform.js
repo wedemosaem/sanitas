@@ -1,130 +1,94 @@
-// heroform.js
-// Expected spreadsheet columns: [image][title rich][description rich]
-// Title & description keep their internal markup by moving child nodes (not using innerHTML)
+// /blocks/hero-form/hero-form.js
+const DEFAULT_IMG = 'https://placehold.co/1200x670';
 
 export default function decorate(block) {
-  block.classList.add('heroform');
+  block.classList.add('hero-form');
 
+  // 1. read placeholders
   const [imgCell, titleCell, descCell] = Array.from(block.children);
 
-  // Resolve bg image
-  const authoredImg = imgCell?.querySelector('img');
-  const bgSrc = authoredImg ? authoredImg.src : (imgCell?.textContent.trim() || '');
+  const rawImg = imgCell?.querySelector('img');
+  const bgSrc = (rawImg && rawImg.src) || (imgCell?.textContent || '').trim() || DEFAULT_IMG;
 
-  // Move children to fragments (preserves rich HTML without innerHTML)
-  const titleFrag = moveChildren(titleCell);
-  const descFrag  = moveChildren(descCell);
+  const titleHTML = (titleCell?.innerHTML || '').trim();
+  const descText  = (descCell?.innerHTML || '').trim(); // allow simple <br> etc.
 
-  // Clear original authored cells
+  // 2. clear authored table
   block.textContent = '';
 
-  /* -------- Build DOM -------- */
-  const hero = el('div', { class: 'hero' });
-  const bgImg = el('img', { class: 'bg-img', src: bgSrc, alt: '' });
-  hero.append(bgImg);
+  // 3. background
+  const bgImg = document.createElement('img');
+  bgImg.className = 'bg-img';
+  bgImg.src = bgSrc;
+  bgImg.alt = '';
 
-  const contentLayer = el('div', { class: 'content-layer' });
-  const heroInner    = el('div', { class: 'hero-inner' });
+  // 4. content layer
+  const overlay = document.createElement('div');
+  overlay.className = 'content-layer';
 
-  // Top bar
-  const topBar   = el('div', { class: 'top-bar' });
-  const logo     = el('div', { class: 'logo' });
-  logo.append(el('img', { src: 'https://serviciosdesalud.sanitas.es/assets/img/logo-sanitas-b.png', alt: 'Sanitas Logo' }));
-  const phoneBox = el('div', { class: 'phone-box' }, '📞 91 291 93 92');
-  topBar.append(logo, phoneBox);
+  const inner = document.createElement('div');
+  inner.className = 'hero-inner';
 
-  // Bottom content
-  const bottomContent = el('div', { class: 'bottom-content' });
+  // top bar (hardcoded logo + phone)
+  const topBar = document.createElement('div');
+  topBar.className = 'top-bar';
 
-  const textBlock = el('div', { class: 'text-block' });
-  const h1 = el('h1'); h1.append(titleFrag);
-  textBlock.append(h1);
+  const logoWrap = document.createElement('div');
+  logoWrap.className = 'logo';
+  logoWrap.innerHTML = `
+    <img src="https://serviciosdesalud.sanitas.es/assets/img/logo-sanitas-b.png" alt="Sanitas Logo">
+  `;
 
-  // wrap desc fragment to keep spacing rules
-  // original HTML used <p>. We'll just append whatever came.
-  const descWrap = document.createDocumentFragment();
-  descWrap.append(descFrag);
-  textBlock.append(descWrap);
+  const phoneBox = document.createElement('div');
+  phoneBox.className = 'phone-box';
+  phoneBox.textContent = '📞 91 291 93 92';
 
-  // Desktop form
-  const formDesktop = buildFormBox('consent');
-  formDesktop.classList.add('form-in-hero');
+  topBar.append(logoWrap, phoneBox);
 
-  bottomContent.append(textBlock, formDesktop);
+  // bottom content (text + form)
+  const bottom = document.createElement('div');
+  bottom.className = 'bottom-content';
 
-  heroInner.append(topBar, bottomContent);
-  contentLayer.append(heroInner);
-  hero.append(contentLayer);
+  const textBlock = document.createElement('div');
+  textBlock.className = 'text-block';
+  textBlock.innerHTML = `
+    <h1>${titleHTML || ''}</h1>
+    <p>${descText || ''}</p>
+  `;
 
-  // Mobile form holder under hero
-  const formHolder = el('div', { class: 'form-holder' });
-  formHolder.append(buildFormBox('consent-m'));
+  const formBox = document.createElement('div');
+  formBox.className = 'form-box form-in-hero';
+  formBox.innerHTML = `
+    <h2>TE ASESORAMOS SIN COMPROMISO</h2>
+    <input type="text" placeholder="Nombre">
+    <input type="email" placeholder="Email">
+    <input type="tel" placeholder="Teléfono">
+    <select>
+      <option disabled selected>Provincia</option>
+      <option>Madrid</option>
+      <option>Barcelona</option>
+      <option>Valencia</option>
+    </select>
+    <div class="privacy">
+      Consulta la <a href="#">información de privacidad</a>
+    </div>
+    <div class="checkbox">
+      <input type="checkbox" id="consent">
+      <label for="consent">Consiento el tratamiento y la cesión por parte de Sanitas a las entidades del grupo Sanitas.</label>
+    </div>
+    <button class="submit-btn">RECIBIR ASESORAMIENTO</button>
+    <div class="secure-note">🔒 Tus datos se tratan de forma segura.</div>
+  `;
 
-  // Mount everything
-  block.append(hero, formHolder);
-}
+  bottom.append(textBlock, formBox);
+  inner.append(topBar, bottom);
+  overlay.append(inner);
 
-/* ---------- helpers ---------- */
+  // optional separate mobile form (same markup), toggled via CSS
+  const mobileHolder = document.createElement('div');
+  mobileHolder.className = 'form-holder';
+  mobileHolder.append(formBox.cloneNode(true));
 
-function el(tag, attrs = {}, text) {
-  const node = document.createElement(tag);
-  Object.entries(attrs).forEach(([k, v]) => {
-    if (v !== undefined && v !== null) node.setAttribute(k, v);
-  });
-  if (text !== undefined) node.textContent = text;
-  return node;
-}
-
-function option({ text, value = text, disabled = false, selected = false }) {
-  const o = document.createElement('option');
-  o.textContent = text;
-  o.value = value;
-  if (disabled) o.disabled = true;
-  if (selected) o.selected = true;
-  return o;
-}
-
-function buildFormBox(consentId) {
-  const box = el('div', { class: 'form-box' });
-
-  const h2 = el('h2'); h2.textContent = 'TE ASESORAMOS SIN COMPROMISO';
-
-  const nameInp = el('input', { type: 'text', placeholder: 'Nombre', 'aria-label': 'Nombre' });
-  const mailInp = el('input', { type: 'email', placeholder: 'Email', 'aria-label': 'Email' });
-  const telInp  = el('input', { type: 'tel', placeholder: 'Teléfono', 'aria-label': 'Teléfono' });
-
-  const provSel = el('select', { 'aria-label': 'Provincia' });
-  provSel.append(
-    option({ text: 'Provincia', disabled: true, selected: true }),
-    option({ text: 'Madrid' }),
-    option({ text: 'Barcelona' }),
-    option({ text: 'Valencia' }),
-  );
-
-  const privacy = el('div', { class: 'privacy' });
-  privacy.append(document.createTextNode('Consulta la '));
-  const a = el('a', { href: '#' }); a.textContent = 'información de privacidad';
-  privacy.append(a);
-
-  const chkWrap = el('div', { class: 'checkbox' });
-  const chk = el('input', { type: 'checkbox', id: consentId });
-  const lbl = el('label', { for: consentId });
-  lbl.textContent = 'Consiento el tratamiento y la cesión por parte de Sanitas a las entidades del grupo Sanitas.';
-  chkWrap.append(chk, lbl);
-
-  const btn = el('button', { class: 'submit-btn', type: 'button' }, 'RECIBIR ASESORAMIENTO');
-
-  const secure = el('div', { class: 'secure-note' }, '🔒 Tus datos se tratan de forma segura.');
-
-  box.append(h2, nameInp, mailInp, telInp, provSel, privacy, chkWrap, btn, secure);
-  return box;
-}
-
-function moveChildren(srcEl) {
-  const frag = document.createDocumentFragment();
-  if (!srcEl) return frag;
-  while (srcEl.firstChild) {
-    frag.appendChild(srcEl.firstChild);
-  }
-  return frag;
+  // 5. assemble
+  block.append(bgImg, overlay, mobileHolder);
 }
