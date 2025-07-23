@@ -71,7 +71,7 @@ export default function decorate(block) {
   const title  = (titleCell?.textContent || '').trim();
   const descHTML = (descCell?.innerHTML || '').trim();
 
-  // clear table
+  // clear authored table
   block.textContent = '';
 
   // background
@@ -93,7 +93,7 @@ export default function decorate(block) {
   // text block
   const textBlock = el('div', { class: 'hb-text-block' }, el('h1', { text: title }));
   if (descHTML) {
-    // keep paragraphs & breaks
+    // preserve simple line breaks
     const tmp = document.createElement('div');
     tmp.innerHTML = descHTML;
     let buf = '';
@@ -117,7 +117,7 @@ export default function decorate(block) {
   inner.append(topBar, bottom);
   overlay.append(inner);
 
-  // assemble hero
+  // assemble
   block.append(bg, overlay);
 
   // mobile form holder placed AFTER hero
