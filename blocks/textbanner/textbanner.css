@@ -1,29 +1,29 @@
 /* textbanner.css */
-/* Prefix with tbx- so we don't leak styles to the site */
 .tbx-textbanner {
-    /* DO NOT force full width; inherit whatever the body/section sets */
-    max-width: inherit;
-    margin: 0; /* keep parent container margins (EDS sets them) */
+    /* no explicit width or margin here – let it flow inside the page container */
   }
   
   .tbx-textbanner__inner {
-    padding: 2rem 1.5rem;
+    /* constrain to the site’s body/content width */
+    max-width: 1140px;      /* or whatever your EDS body max-width is */
+    margin: 0 auto;         /* center it */
+    padding: 2rem 1.5rem;    /* keep your vertical/horizontal padding */
+  
     box-sizing: border-box;
-    background: var(--tbx-bg, #1e5799); /* fallback, overridden inline */
-    color: var(--tbx-fg, #fff);         /* fallback, overridden inline */
-    border-radius: 4px;
+    /* fallback bg in case author leaves it empty */
+    background: #1e5799;
+    color: #fff;
   }
   
   .tbx-textbanner__content {
+    /* same as before */
+    font-family: inherit;
     line-height: 1.5;
     font-size: 1rem;
-    font-family: inherit;
+    /* no extra centering needed here */
   }
   
-  .tbx-textbanner__content strong {
-    font-weight: 700;
-  }
-  
+  /* rest of your responsive tweaks… */
   @media (min-width: 768px) {
     .tbx-textbanner__inner {
       padding: 3rem 2rem;
