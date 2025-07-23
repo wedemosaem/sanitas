@@ -1,20 +1,20 @@
-// /blocks/hero/hero.js
+// /blocks/hb-hero/hb-hero.js
 const DEFAULT_IMG = 'https://placehold.co/1200x670';
 
-function el(tag, props = {}, children = []) {
+function el(tag, attrs = {}, kids = []) {
   const n = document.createElement(tag);
-  Object.entries(props).forEach(([k, v]) => {
+  Object.entries(attrs).forEach(([k, v]) => {
     if (k === 'class') n.className = v;
     else if (k === 'text') n.textContent = v;
-    else if (k === 'html') n.innerHTML = v;
+    else if (k === 'html') n.innerHTML = v; // only for small safe snippets
     else n.setAttribute(k, v);
   });
-  (Array.isArray(children) ? children : [children]).forEach((c) => c && n.append(c));
+  (Array.isArray(kids) ? kids : [kids]).forEach((k) => k && n.append(k));
   return n;
 }
 
-function buildForm(idSuffix = '') {
-  const box = el('div', { class: 'form-box' });
+function buildForm(suffix = '') {
+  const box = el('div', { class: 'hb-form-box' });
   box.append(
     el('h2', { text: 'TE ASESORAMOS SIN COMPROMISO' }),
     el('input', { type: 'text', placeholder: 'Nombre' }),
@@ -30,78 +30,82 @@ function buildForm(idSuffix = '') {
       );
       return s;
     })(),
-    el('div', { class: 'privacy' }, el('span', { html: 'Consulta la <a href="#">información de privacidad</a>' })),
+    el('div', { class: 'hb-privacy' }, el('span', { html: 'Consulta la <a href="#">información de privacidad</a>' })),
     (() => {
-      const wrap = el('div', { class: 'checkbox' });
-      const id = `consent${idSuffix}`;
+      const wrap = el('div', { class: 'hb-checkbox' });
+      const id = `hb-consent${suffix}`;
       wrap.append(
         el('input', { type: 'checkbox', id }),
         el('label', { for: id, text: 'Consiento el tratamiento y la cesión por parte de Sanitas a las entidades del grupo Sanitas.' }),
       );
       return wrap;
     })(),
-    el('button', { class: 'submit-btn', type: 'button', text: 'RECIBIR ASESORAMIENTO' }),
-    el('div', { class: 'secure-note', text: '🔒 Tus datos se tratan de forma segura.' }),
+    el('button', { class: 'hb-submit-btn', type: 'button', text: 'RECIBIR ASESORAMIENTO' }),
+    el('div', { class: 'hb-secure-note', text: '🔒 Tus datos se tratan de forma segura.' }),
   );
   return box;
 }
 
 export default function decorate(block) {
-  block.classList.add('hero');
-
-  // make the wrapping section full width
+  // Make section full-bleed (remove EDS padding/width)
   const section = block.closest('.section');
-  if (section) section.classList.add('hero-full');
+  if (section) section.classList.add('hb-hero-full');
 
+  block.classList.add('hb-hero');
+
+  // read the 3 cells
   const [imgCell, titleCell, descCell] = Array.from(block.children);
-  const authoredImg = imgCell?.querySelector('img')?.src || imgCell?.textContent.trim();
-  const bgSrc = authoredImg || DEFAULT_IMG;
+  const imgSrc = imgCell?.querySelector('img')?.src || imgCell?.textContent.trim() || DEFAULT_IMG;
   const title = (titleCell?.textContent || '').trim();
   const descHTML = (descCell?.innerHTML || '').trim();
 
+  // clear authored content
   block.textContent = '';
 
-  const bg = el('img', { src: bgSrc, alt: '', class: 'bg-img' });
+  // background
+  const bg = el('img', { src: imgSrc, alt: '', class: 'hb-bg-img' });
 
-  const contentLayer = el('div', { class: 'content-layer' }); // no padding here
-  const heroInner = el('div', { class: 'hero-inner' });        // padding moved here
+  // overlay + inner
+  const overlay = el('div', { class: 'hb-content-layer' });
+  const inner   = el('div', { class: 'hb-hero-inner' });
 
-  const topBar = el('div', { class: 'top-bar' }, [
-    el('div', { class: 'logo' },
+  // top bar
+  const topBar = el('div', { class: 'hb-top-bar' }, [
+    el('div', { class: 'hb-logo' },
       el('img', {
         src: 'https://serviciosdesalud.sanitas.es/assets/img/logo-sanitas-b.png',
         alt: 'Sanitas Logo',
       })),
-    el('div', { class: 'phone-box', text: '📞 91 291 93 92' }),
+    el('div', { class: 'hb-phone-box', text: '📞 91 291 93 92' }),
   ]);
 
-  const textBlock = el('div', { class: 'text-block' }, el('h1', { text: title }));
-  // convert description HTML to <p> nodes
+  // text block
+  const textBlock = el('div', { class: 'hb-text-block' }, el('h1', { text: title }));
   if (descHTML) {
     const tmp = el('div', { html: descHTML });
-    const paras = [];
-    let current = '';
+    // turn nodes into <p>
+    let buf = '';
     tmp.childNodes.forEach((n) => {
       if (n.nodeName === 'BR') {
-        if (current.trim()) paras.push(current.trim());
-        current = '';
+        if (buf.trim()) textBlock.append(el('p', { text: buf.trim() }));
+        buf = '';
       } else {
-        current += (n.textContent || '').trim() ? `${n.textContent}` : '';
+        buf += n.textContent || '';
       }
     });
-    if (current.trim()) paras.push(current.trim());
-    paras.forEach((t) => textBlock.append(el('p', { text: t })));
+    if (buf.trim()) textBlock.append(el('p', { text: buf.trim() }));
   }
 
   const desktopForm = buildForm();
-  desktopForm.classList.add('form-in-hero');
+  desktopForm.classList.add('hb-form-in-hero');
 
-  const bottomContent = el('div', { class: 'bottom-content' }, [textBlock, desktopForm]);
+  const bottom = el('div', { class: 'hb-bottom-content' }, [textBlock, desktopForm]);
 
-  heroInner.append(topBar, bottomContent);
-  contentLayer.append(heroInner);
+  inner.append(topBar, bottom);
+  overlay.append(inner);
 
-  const mobileHolder = el('div', { class: 'form-holder' }, buildForm('-m'));
+  // mobile form holder
+  const mobileHolder = el('div', { class: 'hb-form-holder' }, buildForm('-m'));
 
-  block.append(bg, contentLayer, mobileHolder);
+  block.append(bg, overlay, mobileHolder);
 }
