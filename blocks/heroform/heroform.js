@@ -1,94 +1,121 @@
-// /blocks/hero-form/hero-form.js
+// /blocks/hero/hero.js
 const DEFAULT_IMG = 'https://placehold.co/1200x670';
 
-export default function decorate(block) {
-  block.classList.add('hero-form');
+function el(tag, props = {}, children = []) {
+  const node = document.createElement(tag);
+  Object.entries(props).forEach(([k, v]) => {
+    if (k === 'class') node.className = v;
+    else if (k === 'text') node.textContent = v;
+    else if (k === 'html') node.innerHTML = v; // avoid using it for the form, but ok for tiny svg if needed
+    else node.setAttribute(k, v);
+  });
+  (Array.isArray(children) ? children : [children]).forEach((c) => c && node.append(c));
+  return node;
+}
 
-  // 1. read placeholders
+function buildForm(idSuffix = '') {
+  const form = el('div', { class: 'form-box' });
+  form.append(
+    el('h2', { text: 'TE ASESORAMOS SIN COMPROMISO' }),
+    el('input', { type: 'text', placeholder: 'Nombre' }),
+    el('input', { type: 'email', placeholder: 'Email' }),
+    el('input', { type: 'tel', placeholder: 'Teléfono' }),
+    (() => {
+      const sel = el('select');
+      sel.append(
+        el('option', { disabled: '', selected: '', text: 'Provincia' }),
+        el('option', { text: 'Madrid' }),
+        el('option', { text: 'Barcelona' }),
+        el('option', { text: 'Valencia' }),
+      );
+      return sel;
+    })(),
+    el('div', { class: 'privacy' }, el('span', { html: 'Consulta la <a href="#">información de privacidad</a>' })),
+    (() => {
+      const wrap = el('div', { class: 'checkbox' });
+      const id = `consent${idSuffix}`;
+      wrap.append(
+        el('input', { type: 'checkbox', id }),
+        el('label', { for: id, text: 'Consiento el tratamiento y la cesión por parte de Sanitas a las entidades del grupo Sanitas.' }),
+      );
+      return wrap;
+    })(),
+    el('button', { class: 'submit-btn', text: 'RECIBIR ASESORAMIENTO', type: 'button' }),
+    el('div', { class: 'secure-note', text: '🔒 Tus datos se tratan de forma segura.' }),
+  );
+  return form;
+}
+
+export default function decorate(block) {
+  block.classList.add('hero');
+
+  // 3 cells: img, title, description
   const [imgCell, titleCell, descCell] = Array.from(block.children);
 
-  const rawImg = imgCell?.querySelector('img');
-  const bgSrc = (rawImg && rawImg.src) || (imgCell?.textContent || '').trim() || DEFAULT_IMG;
+  const authoredImg = imgCell?.querySelector('img')?.src || imgCell?.textContent.trim();
+  const bgSrc = authoredImg || DEFAULT_IMG;
+  const title = (titleCell?.textContent || '').trim();
+  // allow author to use two lines by separating paragraphs in the sheet (multiple rows) or <br>
+  const description = (descCell?.innerHTML || '').trim(); // allows <br> if they use it
 
-  const titleHTML = (titleCell?.innerHTML || '').trim();
-  const descText  = (descCell?.innerHTML || '').trim(); // allow simple <br> etc.
-
-  // 2. clear authored table
+  // wipe authored content
   block.textContent = '';
 
-  // 3. background
-  const bgImg = document.createElement('img');
-  bgImg.className = 'bg-img';
-  bgImg.src = bgSrc;
-  bgImg.alt = '';
+  // bg image
+  const bg = el('img', { src: bgSrc, alt: '', class: 'bg-img' });
 
-  // 4. content layer
-  const overlay = document.createElement('div');
-  overlay.className = 'content-layer';
+  // overlay
+  const contentLayer = el('div', { class: 'content-layer' });
+  const heroInner    = el('div', { class: 'hero-inner' });
 
-  const inner = document.createElement('div');
-  inner.className = 'hero-inner';
+  // top bar
+  const topBar = el('div', { class: 'top-bar' }, [
+    el('div', { class: 'logo' }, el('img', {
+      src: 'https://serviciosdesalud.sanitas.es/assets/img/logo-sanitas-b.png',
+      alt: 'Sanitas Logo',
+    })),
+    el('div', { class: 'phone-box', text: '📞 91 291 93 92' }),
+  ]);
 
-  // top bar (hardcoded logo + phone)
-  const topBar = document.createElement('div');
-  topBar.className = 'top-bar';
+  // text block
+  const textBlock = el('div', { class: 'text-block' }, [
+    el('h1', { text: title }),
+  ]);
 
-  const logoWrap = document.createElement('div');
-  logoWrap.className = 'logo';
-  logoWrap.innerHTML = `
-    <img src="https://serviciosdesalud.sanitas.es/assets/img/logo-sanitas-b.png" alt="Sanitas Logo">
-  `;
+  // description -> split by <br> if present
+  const tmpDiv = el('div', { html: description }); // helper container
+  if (description) {
+    Array.from(tmpDiv.childNodes).forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const trimmed = node.textContent.trim();
+        if (trimmed) textBlock.append(el('p', { text: trimmed }));
+      } else if (node.nodeName === 'BR') {
+        // skip, paragraphs already split
+      } else {
+        // wrap any other element into p to keep styling
+        const p = el('p');
+        p.append(node);
+        textBlock.append(p);
+      }
+    });
+  }
 
-  const phoneBox = document.createElement('div');
-  phoneBox.className = 'phone-box';
-  phoneBox.textContent = '📞 91 291 93 92';
+  // bottom content (desktop)
+  const bottomContent = el('div', { class: 'bottom-content' }, [
+    textBlock,
+    (() => {
+      const fb = buildForm(); // desktop version
+      fb.classList.add('form-in-hero');
+      return fb;
+    })(),
+  ]);
 
-  topBar.append(logoWrap, phoneBox);
+  heroInner.append(topBar, bottomContent);
+  contentLayer.append(heroInner);
 
-  // bottom content (text + form)
-  const bottom = document.createElement('div');
-  bottom.className = 'bottom-content';
+  // mobile holder
+  const formHolder = el('div', { class: 'form-holder' }, buildForm('-m'));
 
-  const textBlock = document.createElement('div');
-  textBlock.className = 'text-block';
-  textBlock.innerHTML = `
-    <h1>${titleHTML || ''}</h1>
-    <p>${descText || ''}</p>
-  `;
-
-  const formBox = document.createElement('div');
-  formBox.className = 'form-box form-in-hero';
-  formBox.innerHTML = `
-    <h2>TE ASESORAMOS SIN COMPROMISO</h2>
-    <input type="text" placeholder="Nombre">
-    <input type="email" placeholder="Email">
-    <input type="tel" placeholder="Teléfono">
-    <select>
-      <option disabled selected>Provincia</option>
-      <option>Madrid</option>
-      <option>Barcelona</option>
-      <option>Valencia</option>
-    </select>
-    <div class="privacy">
-      Consulta la <a href="#">información de privacidad</a>
-    </div>
-    <div class="checkbox">
-      <input type="checkbox" id="consent">
-      <label for="consent">Consiento el tratamiento y la cesión por parte de Sanitas a las entidades del grupo Sanitas.</label>
-    </div>
-    <button class="submit-btn">RECIBIR ASESORAMIENTO</button>
-    <div class="secure-note">🔒 Tus datos se tratan de forma segura.</div>
-  `;
-
-  bottom.append(textBlock, formBox);
-  inner.append(topBar, bottom);
-  overlay.append(inner);
-
-  // optional separate mobile form (same markup), toggled via CSS
-  const mobileHolder = document.createElement('div');
-  mobileHolder.className = 'form-holder';
-  mobileHolder.append(formBox.cloneNode(true));
-
-  // 5. assemble
-  block.append(bgImg, overlay, mobileHolder);
+  // assemble
+  block.append(bg, contentLayer, formHolder);
 }
